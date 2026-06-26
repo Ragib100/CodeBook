@@ -1,8 +1,11 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-long long rnd(long long l, long long r) { return uniform_int_distribution<long long>(l, r)(rng); }
+mt19937 rng(chrono::steady_clock::
+    now().time_since_epoch().count());
+long long rnd(long long l, long long r) { 
+    return uniform_int_distribution<long long>(l, r)(rng); 
+}
 
 void gen() {
     ofstream in("in.txt");
@@ -16,7 +19,8 @@ int main() {
         system("./brute < in.txt > b.txt");
         system("./fast < in.txt > f.txt");
         if(system("diff -w b.txt f.txt")) {
-            cout << "Mismatch on Test " << tc << "! Check in.txt, b.txt, and f.txt\n";
+            cout << "Mismatch on Test " << tc 
+                 << "! Check in.txt, b.txt, and f.txt\n";
             break;
         }
         cout << "Test " << tc << " OK\n";
