@@ -1,0 +1,106 @@
+% ---------------------------------------------------------------------------
+% Printed Reference Document - MIST CodeCrafters 2.0
+% Md. Ragib Hossain Rifat - 202314022
+%
+% Contest rules this file is built to satisfy:
+%   * A4, single sided, at most 15 pages
+%   * page number in the upper RIGHT corner
+%   * name + student ID in the upper LEFT corner
+%   * readable at 0.5 m without magnification
+%
+% Compile with pdfLaTeX (twice, so the index and page total settle).
+% ---------------------------------------------------------------------------
+\documentclass[9pt,a4paper]{extarticle}
+
+\usepackage[a4paper,left=9mm,right=9mm,top=15mm,bottom=9mm,headsep=3mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+% Inconsolata is denser and cleaner than the default mono; skipped if absent
+\IfFileExists{inconsolata.sty}{\usepackage[scaled=0.95]{inconsolata}}{}
+\usepackage{amsmath,amssymb}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+% --- name / ID top left, page number top right -----------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\bfseries Md. Ragib Hossain Rifat -- 202314022}
+\fancyhead[R]{\footnotesize Page \thepage\ / \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- two columns -----------------------------------------------------------
+\setlength{\columnsep}{5mm}
+\setlength{\columnseprule}{0.2pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+% --- compact headings ------------------------------------------------------
+\titleformat{\section}{\normalfont\bfseries\large}{\thesection}{0.5em}{}[\vspace{-0.6ex}\hrule]
+\titlespacing*{\section}{0pt}{1.4ex}{0.4ex}
+\titleformat{\subsection}{\normalfont\bfseries}{\thesubsection}{0.4em}{}
+\titlespacing*{\subsection}{0pt}{1.0ex}{0.2ex}
+
+% --- compact index ---------------------------------------------------------
+\setlength{\cftbeforesecskip}{0pt}
+\setlength{\cftbeforesubsecskip}{0pt}
+\setlength{\cftsubsecindent}{1.2em}
+\renewcommand{\cftsecfont}{\bfseries\footnotesize}
+\renewcommand{\cftsecpagefont}{\bfseries\footnotesize}
+\renewcommand{\cftsubsecfont}{\footnotesize}
+\renewcommand{\cftsubsecpagefont}{\footnotesize}
+\renewcommand{\cftsecafterpnum}{\vspace{-0.35ex}}
+\renewcommand{\cftsubsecafterpnum}{\vspace{-0.35ex}}
+\setcounter{tocdepth}{2}
+\tocloftpagestyle{fancy}   % tocloft defaults the index page to 'plain'
+
+% --- code listings ---------------------------------------------------------
+\definecolor{cmtcolor}{RGB}{0,110,0}
+\definecolor{kwcolor}{RGB}{0,0,180}
+\definecolor{strcolor}{RGB}{170,45,45}
+\lstset{
+  language=C++,
+  basicstyle=\ttfamily\fontsize{9.0}{9.7}\selectfont,
+  keywordstyle=\color{kwcolor}\bfseries,
+  commentstyle=\color{cmtcolor},
+  stringstyle=\color{strcolor},
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=false,
+  postbreak=\mbox{\textcolor{gray}{$\hookrightarrow$}\space},
+  columns=fullflexible,
+  keepspaces=true,
+  tabsize=2,
+  aboveskip=2pt,
+  belowskip=2pt,
+  xleftmargin=0pt,
+  frame=none,
+  % the source is plain ASCII, so only these need help
+  literate={\ \ }{{\ \ }}1
+}
+
+\begin{document}
+\begin{multicols}{2}
+\raggedcolumns
+
+{\centering\bfseries\large Competitive Programming Reference\par}
+\vspace{0.6ex}
+
+{\small
+\renewcommand{\contentsname}{\normalsize Index}
+\tableofcontents}
+\vspace{1ex}
+
+\input{content}
+
+% Optional: sections cut only to fit 15 pages (adds ~3 pages).
+% Uncomment to include them as a trailing "Extras" section.
+%\input{extras}
+
+\end{multicols}
+\end{document}

@@ -1,0 +1,231 @@
+% Sections dropped from the build purely to save space.
+% Uncomment \input{extras} in main.tex to fold them back in.
+\section{Extras}
+
+\subsection{Power Set}
+\begin{lstlisting}
+void printPowerSet(char* set, int setSz) {
+    // Setsize of power set of a set with
+    // setsize. n is (2^n-1)
+    unsigned int powSetSz = pow(2, setSz);
+    int i, j; // i as counter
+    // Run from i 000..0 to 111..1
+    for (i = 0; i < powSetSz; i++) {
+        for (j = 0; j < setSz; j++) {
+    //Check if jth bit in the counter is set
+    //If set then print jth element from set
+            if (i & (1 << j))
+                cout << set[j];
+        }
+        cout << endl;
+    }
+}
+\end{lstlisting}
+\subsection{Kadane's Algorithm O(n)}
+\begin{lstlisting}
+// return maximum subarray sum.
+int maxSubArraySum(vector<int> &a) {
+    int size = a.size();
+    int maxTill = INT_MIN, maxEnd = 0;
+    for (int i = 0; i < size; i++) {
+        maxEnd = maxEnd + a[i];
+        if (maxTill < maxEnd)
+            maxTill = maxEnd;
+        if (maxEnd < 0)
+            maxEnd = 0;
+    }
+    return maxTill;
+}
+\end{lstlisting}
+\subsection{Depth and width of tree}
+\begin{lstlisting}
+int l[100]= {0}, int r[100]= {0};
+stack<int> mystack;
+int n = 0, w = 0, d = 0;
+int depth(int n){
+????if (l[n]==0 && r[n]==0)
+????????return 1;
+????in depthl=depth(l[n]);
+????int depthr=depth(r[n]);
+????int dep=depthl>depthr ? depthl:depthr;
+????return dep+1;
+}
+void width(int n){
+????if (n<=d){
+????????int t=0,x;
+????????stack<int> tmpstack;
+????????while (!mystack.empty()){
+????????????x=mystack.top();
+????????????mystack.pop();
+????????????if (x!=0){
+????????????????t++;
+????????????????tmpstack.push(l[x]);
+????????????????tmpstack.push(r[x]);
+????????????}
+????????}
+????????w=w>t?w:t;
+????????mystack=tmpstack;
+????????width(n+1);
+????}
+}
+int main(void){
+????cin >> n;
+????for (int i=1; i<=n; i++)
+????????cin >> l[i] >> r[i];
+????d=depth(1);
+????mystack.push(1);
+????width(1);
+????cout << w << " " << d << endl;
+????return 0;
+}
+\end{lstlisting}
+\subsection{All possible SubArraySum in O(1)}
+\begin{lstlisting}
+bitset<100005> bs = 1;
+    for (auto i : a)
+    {
+        bs |= (bs << i); // if previous 1 value pos is possible now ith bit or ith sm is also possible
+    }
+    cout << bs.count() - 1 << endl;
+    for (int i = 1; i <= 100003; i++)
+        if (bs[i])
+            cout << i << " ";
+    cout << endl;
+\end{lstlisting}
+\subsection{Meet in the middle}
+\begin{lstlisting}
+#include <bits/stdc++.h>
+using namespace std;
+int les_equal(vector<int> &s, int key){
+    int size = s.size();
+    int lo = 0, hi = size - 1, ans = 0;
+    while (hi >= lo){
+        int mid = lo + (hi - lo) / 2;
+        if (s[mid] <= key){
+            ans = max(ans, mid);
+            lo = mid + 1;
+        }
+        else hi = mid - 1;
+    }
+    return ans;
+}
+signed main(){
+    FIO int n, n1, n2, t;
+    cin >> n >> t;
+    n1 = (n + 1) / 2;
+    n2 = n / 2;
+    int a1[n1]; for(int &i: a1) cin>>i;
+    int a2[n2]; for(int &i: a2) cin>>i;
+    vector<int> set1, set2;
+    for(int mask=0; mask < (1<<n1); ++mask){
+        int temp_sum = 0;
+        for (int i = 0; i < n1; ++i){
+            int f = 1 << i;
+            if (f & mask)
+                temp_sum += a1[i];
+        }
+        set1.push_back(temp_sum);
+    }
+    for(int mask=0; mask < (1<<n2); ++mask){
+        int temp_sum = 0;
+        for (int i = 0; i < n2; ++i){
+            int f = 1 << i;
+            if (f & mask)
+                temp_sum += a2[i];
+        }
+        set2.push_back(temp_sum);
+    }
+    sort(set2.begin(), set2.end());
+
+    // for(auto itr: set2) cout<<itr<<' ';
+    // cout<<'\n';
+    // for(auto itr: set1) cout<<itr<<' ';
+    // cout<<'\n';
+    int and = 0;
+    for (auto it : set1){
+        int left = t - it;
+        if (left < 0) continue;
+
+        int indx = les_equal(set2, left);
+        int temp_sum_set2 = (indx != -1 ? (it + set2[indx]) : 0);
+        if (temp_sum_set2 <= t)
+            ans = max(ans, temp_sum_set2);
+    }
+    cout<<ans;
+}//TC: O(2^(LK+1))
+\end{lstlisting}
+\subsection{N Queen optimal}
+\begin{lstlisting}
+// It just counts the number of ways to place the order.
+const int N = 32;
+int mark[N][N];
+char grid[N][N];
+int n, cnt;
+void fillup(int row, int col) {
+    for (int i = 1; i < n - row + 1; i++) {
+        mark[row + i][col]++;
+        if (col - i >= 0)
+            mark[row + i][col - i]++;
+        if (col + i < n)
+            mark[row + i][col + i]++;
+    }
+}
+void fillout(int row, int col) {
+    for (int i = 1; i < n - row + 1; i++) {
+        mark[row + i][col]--;
+        if (col - i >= 0)
+            mark[row + i][col - i]--;
+        if (col + i < n)
+            mark[row + i][col + i]--;
+    }
+}
+void find_way(int row) {
+    if (row == n) {
+        cnt++;
+        return;
+    }
+    for (int j = 0; j < n; j++) {
+        if (grid[row][j] == '*' or mark[row][j])
+            continue;
+        fillup(row, j);
+        find_way(row + 1);
+        fillout(row, j);
+    }
+}
+// input in grid. call find_way(0);
+
+
+Debug:
+
+
+#include<bits/stdc++.h>
+using namespace std;
+
+
+void __print(int x) {cerr << x;}
+void __print(long x) {cerr << x;}
+void __print(long long x) {cerr << x;}
+void __print(unsigned x) {cerr << x;}
+void __print(unsigned long x) {cerr << x;}
+void __print(unsigned long long x) {cerr << x;}
+void __print(float x) {cerr << x;}
+void __print(double x) {cerr << x;}
+void __print(long double x) {cerr << x;}
+void __print(char x) {cerr << '\'' << x << '\'';}
+void __print(const char *x) {cerr << '\"' << x << '\"';}
+void __print(const string &x) {cerr << '\"' << x << '\"';}
+void __print(bool x) {cerr << (x ? "true" : "false");}
+
+template<typename T, typename V>
+void __print(const pair<T, V> &x) {cerr << '{'; __print(x.first); cerr << ','; __print(x.second); cerr << '}';}
+template<typename T>
+void __print(const T &x) {int f = 0; cerr << '{'; for (auto &i: x) cerr << (f++ ? "," : ""), __print(i); cerr << "}";}
+void _print() {cerr << "]\n";}
+template <typename T, typename... V>
+void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v...);}
+#ifndef ONLINE_JUDGE
+#define debug(x...) cerr << "[" << #x << "] = ["; _print(x)
+#else
+#define debug(x...)
+#endif
+\end{lstlisting}
