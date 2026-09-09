@@ -9,7 +9,8 @@
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y python3 texlive-latex-base texlive-latex-extra texlive-fonts-recommended
+sudo apt-get install -y python3 texlive-latex-base texlive-latex-recommended \
+    texlive-latex-extra texlive-fonts-recommended texlive-pictures
 ```
 
 The `minted` package (used for syntax highlighting) requires [Pygments](https://pygments.org/):
@@ -22,6 +23,41 @@ Or via apt:
 
 ```bash
 sudo apt-get install -y python3-pygments
+```
+
+### Troubleshooting `minted`
+
+minted v3 does the highlighting through a separate `latexminted` executable
+rather than calling Pygments directly. If the build fails with
+
+```
+! Package minted Error: minted v3+ executable is not installed or is not added to PATH
+```
+
+the copy bundled with your TeX distribution is unusable. On Ubuntu 26.04 the
+bundled `latexminted` 0.6.0 crashes on Python 3.14 with
+`TypeError: ArgParser.__init__() got an unexpected keyword argument 'color'`
+(fixed upstream in `latexminted` 0.7.0, minted issues #463/#464).
+
+Create a `.venv-latexminted` next to `generate_pdf.py` and the build script
+will put it first on `PATH` automatically:
+
+```bash
+python3 -m venv .venv-latexminted
+.venv-latexminted/bin/pip install latexminted
+```
+
+The `latexminted` version must match your `minted.sty` (`kpsewhich minted.sty`):
+`latexminted` 0.7.x requires minted.sty >= 3.8.0, so with the older minted.sty
+3.7.0 shipped by Ubuntu 26.04 you need `latexminted==0.6.0` plus the upstream
+Python 3.14 fix applied to `ArgParser.__init__` in
+`.venv-latexminted/lib/python3.*/site-packages/latexminted/cmdline.py`:
+
+```python
+    def __init__(self, *, prog: str, **kwargs):
+        kwargs.setdefault('allow_abbrev', False)
+        kwargs.setdefault('formatter_class', argparse.RawTextHelpFormatter)
+        super().__init__(prog=prog, **kwargs)
 ```
 
 ## Generating the PDF

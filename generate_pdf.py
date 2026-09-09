@@ -58,9 +58,25 @@ def get_tex(sections):
         tex += '\\section{%s}\n' % texify(section_name)
         for (relative_path, subsection_name, number_of_lines, hash_value) in subsections:
             tex += '\\subsection{\\small %s  \\scriptsize [%s lines] - %s}\n' % (texify(subsection_name), number_of_lines, hash_value)
-            tex += '\\inputminted{%s}{%s}\n' % (get_style(relative_path), '"' + relative_path + '"')
+            # minted v3 does not strip surrounding quotes from the file
+            # argument, so the path is passed bare; spaces are handled natively.
+            tex += '\\inputminted{%s}{%s}\n' % (get_style(relative_path), relative_path)
         tex += '\n'
     return tex
+
+def get_env():
+    """Environment for pdflatex, preferring a local latexminted if present.
+
+    minted v3 shells out to a `latexminted` executable. When the one bundled
+    with the TeX distribution is unusable, `.venv-latexminted` next to this
+    script is put first on PATH so its copy is picked up instead. See README.
+    """
+    env = os.environ.copy()
+    venv_bin = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            ".venv-latexminted", "bin")
+    if os.path.isdir(venv_bin):
+        env["PATH"] = venv_bin + os.pathsep + env.get("PATH", "")
+    return env
 
 if __name__ == "__main__":
     sections = get_sections()
@@ -71,15 +87,22 @@ if __name__ == "__main__":
     # Run LaTeX multiple times to generate table of contents properly
     print("Running LaTeX compilation...")
     
+    env = get_env()
+    # nonstopmode keeps a LaTeX error from blocking the build on stdin
+    pdflatex_options = ["pdflatex", "-shell-escape", "-interaction=nonstopmode",
+                        "notebook.tex"]
+    
     # First run - generates content
-    pdflatex_options = ["pdflatex", "-shell-escape", "notebook.tex"]
-    subprocess.call(pdflatex_options)
+    subprocess.call(pdflatex_options, env=env)
     
     # Second run - generates table of contents
-    subprocess.call(pdflatex_options)
+    subprocess.call(pdflatex_options, env=env)
     
     # Third run - fixes references and page numbers
-    subprocess.call(pdflatex_options)
+    status = subprocess.call(pdflatex_options, env=env)
     
+    if status != 0:
+        print("PDF generation FAILED - see notebook.log")
+        raise SystemExit(status)
     print("PDF generation complete!")
 

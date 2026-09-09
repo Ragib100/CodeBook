@@ -9,6 +9,8 @@ contents.tex
 
 ## Minted directory
 _minted-notebook/*
+_minted/
+*.minted
 
 ## Ignore vim swp files
 *.swp
