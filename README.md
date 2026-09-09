@@ -1,4 +1,4 @@
-# MIST\_EagleForces ICPC Team Notebook
+# ICPC Team Notebook
 
 ## Prerequisites
 
