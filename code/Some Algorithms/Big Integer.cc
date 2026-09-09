@@ -16,8 +16,7 @@ struct BigInteger {
     string res(n + 1, '0');
     int carry = 0;
     for (int i = n - 1; i >= 0; i--) {
-            int digit=(a[i -'0')+(c[i]-'0')
-    +carry;
+      int digit = (a[i] - '0') + (c[i] - '0') + carry;
             carry = digit / 10;
             res[i + 1] = digit % 10 + '0';
     }
@@ -70,8 +69,8 @@ struct BigInteger {
     for (int i = alen - 1; i >= 0; i--) {
       int carry = 0;
       for (int j = clen - 1; j >= 0; j--) {
-                int digit = (a[i] - '0') * 
-     (c[j-'0')+(res[i+j+1]-'0')+carry;
+        int digit = (a[i] - '0') * (c[j] - '0') +
+                    (res[i + j + 1] - '0') + carry;
                 carry = digit / 10;
                 res[i + j + 1] = digit % 10 + '0';
       }

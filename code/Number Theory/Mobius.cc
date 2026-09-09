@@ -1,4 +1,4 @@
-const int N = 11;
+const int N = 1e6 + 5;
 int mob[N];
 void mobius() {
   mob[1] = 1;

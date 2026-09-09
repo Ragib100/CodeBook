@@ -1,15 +1,16 @@
-int f(int pos, int up, int under, int nz) {
-  if (pos == n) return 0;
-  int& ans = dp[pos][under][up][nz];
+// Counts the values in [L, R] with some property: f(R) - f(L - 1).
+// State: position, still hugging the upper bound, seen a non-zero digit yet.
+string s;          // the upper bound, as a digit string
+int dp[20][2][2];
+
+int f(int pos, int tight, int started) {
+  if (pos == (int)s.size()) return started;  // <- put the property here
+  int& ans = dp[pos][tight][started];
   if (ans != -1) return ans;
-  int ans = 0;
-  int start = up ? 0 : s[pos] - '0';
-  int end = under ? 9 : t[pos] - '0';
-  for (int d = start; d <= end; d++) {
-    int n_up = up || (d > s[pos] - '0');
-    int n_under = under || (d < t[pos] - '0');
-    int n_nz = nz || (d != 0);
-    ans += f(pos + 1, n_under, n_up, n_nz);
-  }
+  ans = 0;
+  int hi = tight ? s[pos] - '0' : 9;
+  for (int d = 0; d <= hi; d++)
+    ans += f(pos + 1, tight && d == hi, started || d);
   return ans;
 }
+// memset(dp, -1, sizeof dp); s = to_string(R); f(0, 1, 0);

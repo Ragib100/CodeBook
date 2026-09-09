@@ -3,7 +3,8 @@
 LaTeX source for the printed reference document (MIST CodeCrafters 2.0).
 Built from `rifat_codebook.docx`, plus the Bellman-Ford code added under Graph Theory.
 
-**Current size: 14 A4 pages** (limit is 15), or **15 pages** with the optional extras.
+**Current size: 15 A4 pages — the limit, with no room left.** Anything you add
+now has to come out of something else. `extras.tex` no longer fits.
 
 The page count here is from a local build. Overleaf has `inconsolata`, which is
 narrower than the fallback typewriter font, so it may come out a little shorter --
@@ -15,6 +16,7 @@ check the count in Overleaf after your first compile.
 |---|---|
 | `main.tex` | Preamble, page geometry, header, listing style, index. Compile this one. |
 | `formulas.tex` | The Formula section (area, triangles, trigonometry, sums, logs, series, facts), typeset as real LaTeX math. |
+| `probability.tex` | Probability and expected-value formulas. |
 | `content.tex` | Every code section, generated from the docx. |
 | `extras.tex` | Sections that were dropped only to fit 15 pages. Not included by default. |
 | `main.pdf` | The current build, for reference. |
@@ -60,16 +62,16 @@ build (`’ — × ≤` and friends). Plain `' - x <=` are fine.
 
 ## Turning on the extras
 
-`extras.tex` holds what is still left out for space: power set, Kadane, tree
-depth/width, all-subarray-sum, meet in the middle, and N-Queen. To include them,
-uncomment this line near the end of `main.tex`:
+`extras.tex` holds what is left out for space: power set, Kadane, tree
+depth/width, all-subarray-sum, meet in the middle, and N-Queen. The document is
+now at 15 pages, so these no longer fit — including them needs the code font
+dropped to 8.5 pt first. To include them, uncomment this line in `main.tex`:
 
 ```latex
 %\input{extras}
 ```
 
-That takes the document to exactly 15 pages — the limit, with no margin left. If
-you want them, drop the code font to 8.5 pt as well to buy back some room.
+At 9 pt that overflows the limit; at 8.5 pt it fits.
 
 ## Correctness pass
 

@@ -1,0 +1,64 @@
+% Probability / expected value - the formulas worth having on paper
+\section{Probability \& Expected Value}
+
+\subsection{Basic Rules}
+\[P(\overline{A})=1-P(A)\qquad
+  P(\text{at least one})=1-P(\text{none})\]
+\[P(\ge 1\text{ success in }n\text{ trials})=1-(1-p)^n\]
+\[P(A\cup B)=P(A)+P(B)-P(A\cap B)\]
+\[P(A\mid B)=\frac{P(A\cap B)}{P(B)}\qquad
+  P(A\cap B)=P(A)\,P(B\mid A)\]
+\noindent Only when independent: $P(A\cap B)=P(A)P(B)$.
+
+\subsection{Bayes / Total Probability}
+\noindent For a partition $A_1,\dots,A_n$ of the sample space:
+\[P(B)=\sum_i P(B\mid A_i)\,P(A_i)\]
+\[P(A_i\mid B)=\frac{P(B\mid A_i)\,P(A_i)}{\sum_j P(B\mid A_j)\,P(A_j)}\]
+
+\subsection{Distributions}
+\noindent\textbf{Binomial} --- $k$ successes in $n$ trials:
+\[P(X=k)=\binom{n}{k}p^k(1-p)^{n-k}\]
+\[E[X]=np\qquad \operatorname{Var}(X)=np(1-p)\]
+\noindent\textbf{Geometric} --- first success on trial $k$:
+\[P(X=k)=(1-p)^{k-1}p\qquad E[X]=\frac{1}{p}\]
+\noindent Cost $c$ per attempt $\Rightarrow E[\text{cost}]=c/p$.
+
+\noindent\textbf{Negative binomial} --- $r$-th success on trial $n$:
+\[P(X=n)=\binom{n-1}{r-1}p^r(1-p)^{n-r}\qquad E[X]=\frac{r}{p}\]
+
+\subsection{Expected Value}
+\[E[X]=\sum_x x\,P(X=x)\qquad E[aX+b]=aE[X]+b\]
+\[E[f(X)]=\sum_x f(x)\,P(X=x)\qquad E[X^2]\neq\bigl(E[X]\bigr)^2\]
+\noindent\textbf{Linearity} --- holds even when the $X_i$ are dependent:
+\[E\Bigl[\sum_i X_i\Bigr]=\sum_i E[X_i]\]
+
+\subsection{Indicators}
+\noindent $I_A=1$ if $A$ happens, else $0$, so $E[I_A]=P(A)$. For
+$X=\sum_i I_i$:
+\[E[X]=\sum_i P(A_i)\]
+\noindent Expected number of valid pairs:
+\[E[X]=\sum_{i<j}P\bigl((i,j)\text{ valid}\bigr)\]
+\noindent Expected distinct values over $n$ draws:
+\[E[\text{distinct}]=\sum_v\bigl[1-(1-p_v)^n\bigr]\]
+\noindent Asked for an expected count? Reach for indicators plus
+linearity before building the whole distribution.
+
+\subsection{Variance}
+\[\operatorname{Var}(X)=E[X^2]-\bigl(E[X]\bigr)^2\]
+\[\operatorname{Var}(X+Y)=\operatorname{Var}(X)+\operatorname{Var}(Y)
+  +2\operatorname{Cov}(X,Y)\]
+\noindent Independent $\Rightarrow
+\operatorname{Var}\bigl(\sum_i X_i\bigr)=\sum_i\operatorname{Var}(X_i)$.
+Variance needs that independence; linearity of $E$ never does.
+
+\subsection{Expected-Value DP}
+\noindent From state $s$, move to $t$ with probability $p_t$ paying
+$c(s,t)$:
+\[E[s]=\sum_t p_t\bigl(c(s,t)+E[t]\bigr)\]
+\noindent One operation per step:
+\[E_i=1+\sum_j p_{ij}E_j\]
+\noindent Self-loop --- finish with probability $p$, else repeat, cost
+$c$ each time:
+\[E=pc+(1-p)(c+E)\ \Longrightarrow\ E=\frac{c}{p}\]
+\noindent Many states $\Rightarrow$ solve $A\mathbf{x}=\mathbf{b}$ by
+Gaussian elimination.

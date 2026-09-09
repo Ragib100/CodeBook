@@ -14,9 +14,9 @@ int main(void) {
         f[j] = k + 1;
     }
   }
-  int and = 0;
+  int ans = 0;
   for (int i = 1; i <= m; i++)
     if (f[i] > ans) ans = f[i];
-  cout << and<< endl;
+  cout << ans << endl;
   return 0;
 }

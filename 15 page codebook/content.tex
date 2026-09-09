@@ -89,6 +89,7 @@ int main() {
 // settings.json also needs: "files.autoSaveDelay": 100
 \end{lstlisting}
 \input{formulas}
+\input{probability}
 \section{Number Theory}
 \subsection{BINARY EXPONENTIATION:(a\^{}b)}
 \begin{lstlisting}
@@ -138,6 +139,58 @@ while (n>1){
     r = factor(n);
     printf("%d", r);
     n /= r;
+}
+\end{lstlisting}
+\subsection{Miller-Rabin + Pollard's Rho}
+\begin{lstlisting}
+using u64 = uint64_t;
+using u128 = __uint128_t;
+u64 binpower(u64 b, u64 e, u64 mod) {
+    u64 r = 1; b %= mod;
+    while (e) {
+        if (e & 1) r = (u128)r * b % mod;
+        b = (u128)b * b % mod;
+        e >>= 1;
+    }
+    return r;
+}
+bool check_composite(u64 n, u64 a, u64 d, int s) {
+    u64 x = binpower(a, d, n);
+    if (x == 1 || x == n - 1) return false;
+    for (int r = 1; r < s; r++) {
+        x = (u128)x * x % n;
+        if (x == n - 1) return false;
+    }
+    return true;
+}
+// these bases are deterministic for every n < 2^64
+bool MillerRabin(u64 n) {
+    if (n < 2) return false;
+    int s = 0; u64 d = n - 1;
+    while ((d & 1) == 0) { d >>= 1; s++; }
+    for (u64 a : {2,3,5,7,11,13,17,19,23,29,31,37}) {
+        if (n == a) return true;
+        if (check_composite(n, a, d, s)) return false;
+    }
+    return true;
+}
+u64 pollard(u64 n) {              // one non-trivial factor of composite n
+    if (n % 2 == 0) return 2;
+    for (u64 c = 1;; c++) {
+        auto f = [&](u64 x) { return ((u128)x * x + c) % n; };
+        u64 x = 2, y = 2, d = 1;
+        while (d == 1) {
+            x = f(x); y = f(f(y));
+            d = __gcd(x > y ? x - y : y - x, n);
+        }
+        if (d != n) return d;     // else retry with the next c
+    }
+}
+void factor(u64 n, vector<u64> &out) {   // full factorisation, unsorted
+    if (n == 1) return;
+    if (MillerRabin(n)) { out.push_back(n); return; }
+    u64 d = pollard(n);
+    factor(d, out); factor(n / d, out);
 }
 \end{lstlisting}
 \subsection{smallest prime factor(SPF) 1 to N}
@@ -368,6 +421,19 @@ void phi_1_to_n() {
 }
 // Fact: the phi of every divisor of N sums to N.
 // N = 10: divisors 1, 2, 5, 10 -> 1+1+4+4 = 10
+\end{lstlisting}
+\subsection{Mobius}
+\begin{lstlisting}
+const int N = 1e6 + 5;
+int mob[N];
+void mobius() {
+    mob[1] = 1;
+    for (int i = 2; i < N; i++) {
+        mob[i]--;
+        for (int j = i + i; j < N; j += i)
+            mob[j] -= mob[i];
+    }
+}
 \end{lstlisting}
 \subsection{nCr(more space, less time)}
 \begin{lstlisting}
@@ -612,6 +678,31 @@ public:
     }
 };
 \end{lstlisting}
+\subsection{Ternary Search}
+\begin{lstlisting}
+// maximum of a unimodal f on [l, r]; flip the < for the minimum
+double ternary_search(double l, double r) {
+    double eps = 1e-9;
+    while (r - l > eps) {
+        double m1 = l + (r - l) / 3, m2 = r - (r - l) / 3;
+        if (f(m1) < f(m2)) l = m1;
+        else r = m2;
+    }
+    return f(l);
+}
+\end{lstlisting}
+\subsection{Monotonic Stack (next greater)}
+\begin{lstlisting}
+// needs: stack<int> stk; vector<int> v(n), ind(n);
+// ind[i] = index of the next strictly greater element to the right
+for (int i = n - 1; i >= 0; i--) {
+    while (!stk.empty() && v[i] >= v[stk.top()]) stk.pop();
+    ind[i] = stk.empty() ? -1 : stk.top();
+    stk.push(i);
+}
+// v   = 3 1 5 4 10
+// ind = 2 2 4 4 -1
+\end{lstlisting}
 \subsection{Biginteger Operation}
 \begin{lstlisting}
 struct BigInteger {
@@ -732,17 +823,8 @@ int grundy(int n, vector<int>& moves, vector<int>& dp) {
     }
     return dp[n] = mex(s);
 }
-
-int main() {
-    vector<int> moves = {1, 2, 3}; // allowed moves
-    int n = 10; // number of stones
-    vector<int> dp(n + 1, -1);
-
-    for (int i = 0; i <= n; i++)
-        cout << "G(" << i << ") = " << grundy(i, moves, dp) << endl;
-
-    return 0;
-}
+// vector<int> moves = {1,2,3}; vector<int> dp(n+1, -1);
+// grundy(n, moves, dp);  XOR the grundy values of independent piles
 \end{lstlisting}
 \subsection{Manacher}
 \begin{lstlisting}
@@ -907,6 +989,38 @@ int query(int u,int st,int en,int l,int r){
         return left + right;
     }
 }
+\end{lstlisting}
+\subsection{Fenwick Tree (BIT)}
+\begin{lstlisting}
+int fenwick[N];                  // 1-indexed
+void update(int ind, int val) {  // add val at ind
+    while (ind < N) { fenwick[ind] += val; ind += ind & -ind; }
+}
+int query(int ind) {             // prefix sum [1, ind]
+    int sum = 0;
+    while (ind > 0) { sum += fenwick[ind]; ind -= ind & -ind; }
+    return sum;
+}
+// range [l, r] = query(r) - query(l - 1)
+
+struct Fenwick2D {
+    int n, m;
+    vector<vector<int>> t;
+    Fenwick2D(int n, int m) : n(n), m(m), t(n+1, vector<int>(m+1, 0)) {}
+    void update(int i, int j, int v) {
+        for (int x = i; x <= n; x += x & -x)
+            for (int y = j; y <= m; y += y & -y) t[x][y] += v;
+    }
+    int query(int i, int j) {
+        int s = 0;
+        for (int x = i; x > 0; x -= x & -x)
+            for (int y = j; y > 0; y -= y & -y) s += t[x][y];
+        return s;
+    }
+    int query(int r1, int c1, int r2, int c2) {
+        return query(r2,c2) - query(r1-1,c2) - query(r2,c1-1) + query(r1-1,c1-1);
+    }
+};
 \end{lstlisting}
 \subsection{DSU}
 \begin{lstlisting}
@@ -1222,15 +1336,7 @@ int maxmatrix(int n){
     }
     return sum;
 }
-int main(void){
-    int n=0;
-    cin >> n;
-    for (int i=1; i<=n; i++)
-        for (int j=1; j<=n; j++)
-            cin >> a[i][j];
-    cout << maxmatrix(n);
-    return 0;
-}
+// read a[1..n][1..n], then call maxmatrix(n)
 \end{lstlisting}
 \subsection{SOS DP}
 \begin{lstlisting}
@@ -1255,6 +1361,23 @@ for (int i = 0; i < n; i++)
     for (int mask = 0; mask < (1 << n); mask++)
         if (mask & (1 << i))
             sos[mask] += sos[mask ^ (1 << i)];
+\end{lstlisting}
+\subsection{Digit DP}
+\begin{lstlisting}
+// count the values in [L, R] with some property: f(R) - f(L - 1)
+string s;              // the upper bound, as a digit string
+int dp[20][2][2];      // pos, tight, started
+int f(int pos, int tight, int started) {
+    if (pos == (int)s.size()) return started;   // <- the property goes here
+    int &ans = dp[pos][tight][started];
+    if (ans != -1) return ans;
+    ans = 0;
+    int hi = tight ? s[pos] - '0' : 9;
+    for (int d = 0; d <= hi; d++)
+        ans += f(pos + 1, tight && d == hi, started || d);
+    return ans;
+}
+// memset(dp, -1, sizeof dp); s = to_string(R); f(0, 1, 0);
 \end{lstlisting}
 \subsection{Knapsack}
 \begin{lstlisting}
@@ -1451,6 +1574,46 @@ void topo_sort() {
             }
         }
     }
+}
+\end{lstlisting}
+\subsection{SCC + Condensation}
+\begin{lstlisting}
+// components = the SCCs, adj_cond = condensation graph
+// (its vertices are named by the smallest vertex of each SCC)
+vector<bool> visited;
+void dfs(int v, vector<vector<int>> const &adj, vector<int> &out) {
+    visited[v] = true;
+    for (auto u : adj[v])
+        if (!visited[u]) dfs(u, adj, out);
+    out.push_back(v);
+}
+void scc(vector<vector<int>> const &adj, vector<vector<int>> &components,
+         vector<vector<int>> &adj_cond) {
+    int n = adj.size();
+    components.clear(), adj_cond.clear();
+    vector<int> order;               // vertices by exit time
+    visited.assign(n, false);
+    for (int i = 0; i < n; i++)
+        if (!visited[i]) dfs(i, adj, order);
+    vector<vector<int>> adj_rev(n);  // transpose
+    for (int v = 0; v < n; v++)
+        for (int u : adj[v]) adj_rev[u].push_back(v);
+    visited.assign(n, false);
+    reverse(order.begin(), order.end());
+    vector<int> roots(n, 0);         // root of each vertex's SCC
+    for (auto v : order)
+        if (!visited[v]) {
+            vector<int> component;
+            dfs(v, adj_rev, component);
+            components.push_back(component);
+            int root = *min_element(begin(component), end(component));
+            for (auto u : component) roots[u] = root;
+        }
+    adj_cond.assign(n, {});
+    for (int v = 0; v < n; v++)
+        for (auto u : adj[v])
+            if (roots[v] != roots[u])
+                adj_cond[roots[v]].push_back(roots[u]);
 }
 \end{lstlisting}
 \subsection{Kruskal O(ElogE)}

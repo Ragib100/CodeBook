@@ -15,8 +15,8 @@ int query(int ind) {
 }
 
 struct Fenwick2D {
-  vector<vector<int>> t;
   int n, m;
+  vector<vector<int>> t;
   Fenwick2D(int n, int m) : n(n), m(m), t(n + 1, vector<int>(m + 1, 0)) {}
 
   void update(int i, int j, int v) {
