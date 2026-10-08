@@ -1,3 +1,8 @@
+## Environment variables
+.env
+.env.*
+!.env.example
+
 ## Ignore Latex temporary files
 *.aux
 *.fdb_latexmk

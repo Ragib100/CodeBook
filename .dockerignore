@@ -1,0 +1,16 @@
+.git
+.vscode
+venv/
+.venv*/
+code/
+math/
+images/
+.env
+*.pdf
+contents.tex
+config.tex
+*.aux
+*.log
+*.out
+*.toc
+_minted/
