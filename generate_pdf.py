@@ -117,11 +117,14 @@ def load_env(path=".env"):
     return env
 
 def write_config(env):
-    members = ", ".join(m.strip() for m in env["TEAM_MEMBERS"].split(",") if m.strip())
+    members = [m.strip() for m in env["TEAM_MEMBERS"].split(",") if m.strip()]
+    # \mbox keeps each full name on one line, so wrapping only happens
+    # between names, never in the middle of one
+    authors = ", ".join("\\mbox{%s}" % texify(m) for m in members)
     with open("config.tex", "w", encoding="utf-8") as f:
         f.write("\\newcommand{\\NotebookTeam}{%s}\n" % texify(env["TEAM_NAME"]))
         f.write("\\newcommand{\\NotebookInstitution}{%s}\n" % texify(env["INSTITUTION_NAME"]))
-        f.write("\\newcommand{\\NotebookAuthors}{%s}\n" % texify(members))
+        f.write("\\newcommand{\\NotebookAuthors}{%s}\n" % authors)
 
 if __name__ == "__main__":
     write_config(load_env())
